@@ -7,21 +7,27 @@ require('dotenv').config()
 
 
 const schema = buildSchema(`
+
+    enum Unit {
+        standard
+        metric
+        imperial
+    }
     type Weather {
         temperature: Float!
         description: String!
     }
 
     type Query {
-        getWeather(zip: Int!): Weather!
+        getWeather(zip: Int!, units: Unit): Weather!
     }
 `)
 
 
 const root = {
-    getWeather: async ({ zip }) => {
+    getWeather: async ({ zip, units = 'imperial' }) => {
           const apikey = process.env.OPENWEATHERMAP_API_KEY
-          const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apikey}`
+          const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apikey}&units=${units}`
           const res = await fetch(url)
           const json = await res.json()
           const temperature = json.main.temp
